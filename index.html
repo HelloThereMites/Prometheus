@@ -1,14 +1,18 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <style>
-        body { background: #1a1a1a; color: #2ecc71; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; font-family: sans-serif; border: 5px solid #2ecc71; margin: 0; }
-        h1 { font-size: 50px; text-transform: uppercase; letter-spacing: 5px; }
-        p { font-size: 20px; color: white; }
-    </style>
-</head>
-<body>
-    <h1>Connection Stable</h1>
-    <p>Bifröst has successfully bridged to your GitHub Vault.</p>
-</body>
-</html>
+function launch() {
+  // We use the proxy so the network doesn't know we are hitting GitHub
+  const target = "https://cdn.jsdelivr.net/gh/gn-math/gn-math-DONTDMCA@main/singlefile.html";
+  const proxy = "https://corsproxy.io/?" + encodeURIComponent(target);
+
+  fetch(proxy)
+    .then(response => response.text())
+    .then(html => {
+        // Clear the page
+        document.open();
+        document.write(html);
+        document.close();
+        
+        // This 'document.write' method actually handles script activation 
+        // better than innerHTML in many browsers!
+    })
+    .catch(error => console.error('Bridge failed:', error));
+}
