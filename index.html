@@ -1,53 +1,47 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Bifrost Bridge</title>
+    <title>System Loading</title>
     <style>
         body { background: #050505; color: #3498db; font-family: 'Courier New', monospace; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; margin: 0; }
-        .loader { width: 250px; height: 4px; background: #222; border-radius: 10px; overflow: hidden; margin-top: 20px; }
-        .fill { width: 0%; height: 100%; background: #3498db; box-shadow: 0 0 10px #3498db; transition: width 0.3s; }
-        h2 { letter-spacing: 3px; font-size: 18px; text-transform: uppercase; }
+        .loader-bar { width: 200px; height: 2px; background: #222; position: relative; overflow: hidden; margin-top: 20px; }
+        .progress { width: 100%; height: 100%; background: #3498db; position: absolute; animation: load 2s infinite ease-in-out; }
+        @keyframes load {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+        h2 { font-size: 14px; letter-spacing: 2px; text-transform: uppercase; opacity: 0.8; }
     </style>
 </head>
 <body>
-    <h2 id="status">Pulling Data...</h2>
-    <div class="loader"><div class="fill" id="fill"></div></div>
+    <h2 id="status">Establishing Secure Link...</h2>
+    <div class="loader-bar"><div class="progress"></div></div>
 
     <script>
         async function launch() {
+            // Using the math site link
             const target = "https://cdn.jsdelivr.net/gh/gn-math/gn-math-DONTDMCA@main/singlefile.html";
+            // Switching to a more direct proxy link for speed
             const proxy = "https://api.allorigins.win/raw?url=" + encodeURIComponent(target);
-            const fill = document.getElementById('fill');
             const status = document.getElementById('status');
 
             try {
                 const response = await fetch(proxy);
-                const reader = response.body.getReader();
-                const total = 5000000; // Estimated 5MB for the math site
-                let loaded = 0;
-                let chunks = [];
+                if (!response.ok) throw new Error("Proxy Error");
+                
+                const html = await response.text();
 
-                while(true) {
-                    const {done, value} = await reader.read();
-                    if (done) break;
-                    chunks.push(value);
-                    loaded += value.length;
-                    
-                    // Update the loading bar
-                    let percent = Math.min(Math.round((loaded / total) * 100), 99);
-                    fill.style.width = percent + "%";
-                }
+                if (html.length < 100) throw new Error("Empty Response");
 
-                status.innerText = "Decompressing...";
-                const blob = new Blob(chunks);
-                const html = await blob.text();
-
+                // Inject the content
                 document.open();
                 document.write(html);
                 document.close();
             } catch (error) {
-                status.innerText = "Bridge Fractured";
+                status.innerText = "LINK FAILED - RETRYING...";
                 console.error(error);
+                // Auto-retry after 3 seconds if it fails
+                setTimeout(launch, 3000);
             }
         }
         launch();
