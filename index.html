@@ -2,34 +2,54 @@
 <html>
 <head>
     <title>Bifrost Bridge</title>
+    <style>
+        body { background: #050505; color: #3498db; font-family: 'Courier New', monospace; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; margin: 0; }
+        .loader { width: 250px; height: 4px; background: #222; border-radius: 10px; overflow: hidden; margin-top: 20px; }
+        .fill { width: 0%; height: 100%; background: #3498db; box-shadow: 0 0 10px #3498db; transition: width 0.3s; }
+        h2 { letter-spacing: 3px; font-size: 18px; text-transform: uppercase; }
+    </style>
 </head>
 <body>
+    <h2 id="status">Pulling Data...</h2>
+    <div class="loader"><div class="fill" id="fill"></div></div>
+
     <script>
-        // We wrap the logic in a script tag so the browser executes it
-        function launch() {
-            // Your target math site
+        async function launch() {
             const target = "https://cdn.jsdelivr.net/gh/gn-math/gn-math-DONTDMCA@main/singlefile.html";
-            
-            // We use AllOrigins because CorsProxy is now restricted
             const proxy = "https://api.allorigins.win/raw?url=" + encodeURIComponent(target);
+            const fill = document.getElementById('fill');
+            const status = document.getElementById('status');
 
-            console.log("Fetching payload...");
+            try {
+                const response = await fetch(proxy);
+                const reader = response.body.getReader();
+                const total = 5000000; // Estimated 5MB for the math site
+                let loaded = 0;
+                let chunks = [];
 
-            fetch(proxy)
-                .then(response => response.text())
-                .then(html => {
-                    // This clears the 'about:blank' page and injects the site
-                    document.open();
-                    document.write(html);
-                    document.close();
-                })
-                .catch(error => {
-                    document.body.innerHTML = "<h2>Bridge Failed: Connection Refused</h2>";
-                    console.error('Error:', error);
-                });
+                while(true) {
+                    const {done, value} = await reader.read();
+                    if (done) break;
+                    chunks.push(value);
+                    loaded += value.length;
+                    
+                    // Update the loading bar
+                    let percent = Math.min(Math.round((loaded / total) * 100), 99);
+                    fill.style.width = percent + "%";
+                }
+
+                status.innerText = "Decompressing...";
+                const blob = new Blob(chunks);
+                const html = await blob.text();
+
+                document.open();
+                document.write(html);
+                document.close();
+            } catch (error) {
+                status.innerText = "Bridge Fractured";
+                console.error(error);
+            }
         }
-
-        // This line tells the browser: "Run this the moment the page opens!"
         launch();
     </script>
 </body>
