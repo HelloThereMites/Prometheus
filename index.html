@@ -3,9 +3,10 @@
 <head>
     <title>Google Docs: Project Proposal Draft</title>
     <link rel="icon" type="image/x-icon" href="https://ssl.gstatic.com/docs/documents/images/kix-favicon7.ico">
+    
     <style>
         body { 
-            background: #0a0a0a; 
+            background: #050505; 
             color: #3498db; 
             font-family: 'Courier New', monospace; 
             display: flex; 
@@ -14,6 +15,7 @@
             justify-content: center; 
             height: 100vh; 
             margin: 0; 
+            overflow: hidden;
         }
         .menu {
             border: 1px solid #1a1a1a;
@@ -22,11 +24,12 @@
             border-radius: 8px;
             text-align: center;
             box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            z-index: 10;
         }
-        h1 { font-size: 18px; letter-spacing: 4px; margin-bottom: 30px; color: #555; }
+        h1 { font-size: 14px; letter-spacing: 4px; margin-bottom: 30px; color: #444; text-transform: uppercase; }
         .btn {
             display: block;
-            width: 200px;
+            width: 220px;
             padding: 15px;
             margin: 10px auto;
             background: transparent;
@@ -43,7 +46,8 @@
             color: #000;
             box-shadow: 0 0 15px #3498db;
         }
-        #frame-container {
+        /* Full screen container for the sites */
+        #content-layer {
             display: none;
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
@@ -51,34 +55,56 @@
             z-index: 9999;
         }
         iframe { width: 100%; height: 100%; border: none; }
+        #status-text { font-size: 10px; color: #333; margin-top: 15px; }
     </style>
 </head>
 <body>
 
     <div id="main-menu" class="menu">
-        <h1>PROMETHEUS SWITCHBOARD</h1>
-        <button class="btn" onclick="loadSite('math')">GN Math</button>
-        <button class="btn" onclick="loadSite('tubi')">Tubi TV</button>
+        <h1>System Switchboard</h1>
+        <button class="btn" onclick="launchMath()">GN Math</button>
+        <button class="btn" onclick="launchTubi()">Stream Tubi</button>
+        <button class="btn" onclick="launchProxy()">Ultra Proxy</button>
+        <div id="status-text">BIFRÖST v6.0 ONLINE</div>
     </div>
 
-    <div id="frame-container">
+    <div id="content-layer">
         <iframe id="site-frame" src=""></iframe>
     </div>
 
     <script>
-        function loadSite(type) {
-            const container = document.getElementById('frame-container');
-            const frame = document.getElementById('site-frame');
-            
-            if (type === 'math') {
-                // We use the proxy for the math file since it's a raw code file
-                frame.src = "https://api.allorigins.win/raw?url=" + encodeURIComponent("https://cdn.jsdelivr.net/gh/gn-math/gn-math-DONTDMCA@main/singlefile.html");
-            } else if (type === 'tubi') {
-                // Tubi works better direct, but some browsers may block it in an iframe
-                frame.src = "https://tubitv.com/home";
-            }
+        const frame = document.getElementById('site-frame');
+        const layer = document.getElementById('content-layer');
+        const status = document.getElementById('status-text');
 
-            container.style.display = "block";
+        // 1. GN MATH: Injects code so the URL stays 'about:blank'
+        async function launchMath() {
+            status.innerText = "INJECTING PAYLOAD...";
+            const target = "https://cdn.jsdelivr.net/gh/gn-math/gn-math-DONTDMCA@main/singlefile.html";
+            const proxy = "https://api.allorigins.win/raw?url=" + encodeURIComponent(target);
+
+            try {
+                const response = await fetch(proxy);
+                const html = await response.text();
+                document.open();
+                document.write(html);
+                document.close();
+            } catch (e) {
+                status.innerText = "TUNNEL BLOCKED BY NETWORK";
+            }
+        }
+
+        // 2. TUBI: Replaces the page to bypass security blocks
+        function launchTubi() {
+            // Using replace so Tubi doesn't get blocked by the iframe 'DENY' rule
+            window.location.replace("https://tubitv.com/home");
+        }
+
+        // 3. ULTRA PROXY: Opens a hidden browser for any site
+        function launchProxy() {
+            layer.style.display = "block";
+            // This loads a proxy service that lets you browse anything undetected
+            frame.src = "https://v-6.allghost.com/"; 
         }
 
         // PANIC KEY: Press 'Esc' to go to Classroom immediately
