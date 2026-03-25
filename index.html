@@ -1,50 +1,92 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>System Loading</title>
+    <title>Google Docs: Project Proposal Draft</title>
+    <link rel="icon" type="image/x-icon" href="https://ssl.gstatic.com/docs/documents/images/kix-favicon7.ico">
     <style>
-        body { background: #050505; color: #3498db; font-family: 'Courier New', monospace; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; margin: 0; }
-        .loader-bar { width: 200px; height: 2px; background: #222; position: relative; overflow: hidden; margin-top: 20px; }
-        .progress { width: 100%; height: 100%; background: #3498db; position: absolute; animation: load 2s infinite ease-in-out; }
-        @keyframes load {
-            0% { transform: translateX(-100%); }
-            100% { transform: translateX(100%); }
+        body { 
+            background: #0a0a0a; 
+            color: #3498db; 
+            font-family: 'Courier New', monospace; 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            justify-content: center; 
+            height: 100vh; 
+            margin: 0; 
         }
-        h2 { font-size: 14px; letter-spacing: 2px; text-transform: uppercase; opacity: 0.8; }
+        .menu {
+            border: 1px solid #1a1a1a;
+            padding: 40px;
+            background: #111;
+            border-radius: 8px;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+        h1 { font-size: 18px; letter-spacing: 4px; margin-bottom: 30px; color: #555; }
+        .btn {
+            display: block;
+            width: 200px;
+            padding: 15px;
+            margin: 10px auto;
+            background: transparent;
+            border: 1px solid #3498db;
+            color: #3498db;
+            cursor: pointer;
+            font-family: inherit;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            transition: 0.3s;
+        }
+        .btn:hover {
+            background: #3498db;
+            color: #000;
+            box-shadow: 0 0 15px #3498db;
+        }
+        #frame-container {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: #000;
+            z-index: 9999;
+        }
+        iframe { width: 100%; height: 100%; border: none; }
     </style>
 </head>
 <body>
-    <h2 id="status">Establishing Secure Link...</h2>
-    <div class="loader-bar"><div class="progress"></div></div>
+
+    <div id="main-menu" class="menu">
+        <h1>PROMETHEUS SWITCHBOARD</h1>
+        <button class="btn" onclick="loadSite('math')">GN Math</button>
+        <button class="btn" onclick="loadSite('tubi')">Tubi TV</button>
+    </div>
+
+    <div id="frame-container">
+        <iframe id="site-frame" src=""></iframe>
+    </div>
 
     <script>
-        async function launch() {
-            // Using the math site link
-            const target = "https://cdn.jsdelivr.net/gh/gn-math/gn-math-DONTDMCA@main/singlefile.html";
-            // Switching to a more direct proxy link for speed
-            const proxy = "https://api.allorigins.win/raw?url=" + encodeURIComponent(target);
-            const status = document.getElementById('status');
-
-            try {
-                const response = await fetch(proxy);
-                if (!response.ok) throw new Error("Proxy Error");
-                
-                const html = await response.text();
-
-                if (html.length < 100) throw new Error("Empty Response");
-
-                // Inject the content
-                document.open();
-                document.write(html);
-                document.close();
-            } catch (error) {
-                status.innerText = "LINK FAILED - RETRYING...";
-                console.error(error);
-                // Auto-retry after 3 seconds if it fails
-                setTimeout(launch, 3000);
+        function loadSite(type) {
+            const container = document.getElementById('frame-container');
+            const frame = document.getElementById('site-frame');
+            
+            if (type === 'math') {
+                // We use the proxy for the math file since it's a raw code file
+                frame.src = "https://api.allorigins.win/raw?url=" + encodeURIComponent("https://cdn.jsdelivr.net/gh/gn-math/gn-math-DONTDMCA@main/singlefile.html");
+            } else if (type === 'tubi') {
+                // Tubi works better direct, but some browsers may block it in an iframe
+                frame.src = "https://tubitv.com/home";
             }
+
+            container.style.display = "block";
         }
-        launch();
+
+        // PANIC KEY: Press 'Esc' to go to Classroom immediately
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                window.location.href = 'https://classroom.google.com';
+            }
+        });
     </script>
 </body>
 </html>
