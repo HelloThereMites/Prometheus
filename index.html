@@ -1,18 +1,32 @@
-function launch() {
-  // We use the proxy so the network doesn't know we are hitting GitHub
-  const target = "https://cdn.jsdelivr.net/gh/gn-math/gn-math-DONTDMCA@main/singlefile.html";
-  const proxy = "https://corsproxy.io/?" + encodeURIComponent(target);
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Bifrost Bridge</title>
+</head>
+<body>
+    <script>
+        // This function will run as soon as the about:blank page opens
+        function launch() {
+            const target = "https://cdn.jsdelivr.net/gh/gn-math/gn-math-DONTDMCA@main/singlefile.html";
+            const proxy = "https://corsproxy.io/?" + encodeURIComponent(target);
 
-  fetch(proxy)
-    .then(response => response.text())
-    .then(html => {
-        // Clear the page
-        document.open();
-        document.write(html);
-        document.close();
-        
-        // This 'document.write' method actually handles script activation 
-        // better than innerHTML in many browsers!
-    })
-    .catch(error => console.error('Bridge failed:', error));
-}
+            console.log("Fetching payload...");
+
+            fetch(proxy)
+                .then(response => response.text())
+                .then(html => {
+                    document.open();
+                    document.write(html);
+                    document.close();
+                })
+                .catch(error => {
+                    document.body.innerHTML = "<h2>Bridge Failed: Check Connection</h2>";
+                    console.error('Error:', error);
+                });
+        }
+
+        // Call the function immediately
+        launch();
+    </script>
+</body>
+</html>
