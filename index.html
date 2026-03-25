@@ -5,27 +5,31 @@
 </head>
 <body>
     <script>
-        // This function will run as soon as the about:blank page opens
+        // We wrap the logic in a script tag so the browser executes it
         function launch() {
+            // Your target math site
             const target = "https://cdn.jsdelivr.net/gh/gn-math/gn-math-DONTDMCA@main/singlefile.html";
-            const proxy = "https://corsproxy.io/?" + encodeURIComponent(target);
+            
+            // We use AllOrigins because CorsProxy is now restricted
+            const proxy = "https://api.allorigins.win/raw?url=" + encodeURIComponent(target);
 
             console.log("Fetching payload...");
 
             fetch(proxy)
                 .then(response => response.text())
                 .then(html => {
+                    // This clears the 'about:blank' page and injects the site
                     document.open();
                     document.write(html);
                     document.close();
                 })
                 .catch(error => {
-                    document.body.innerHTML = "<h2>Bridge Failed: Check Connection</h2>";
+                    document.body.innerHTML = "<h2>Bridge Failed: Connection Refused</h2>";
                     console.error('Error:', error);
                 });
         }
 
-        // Call the function immediately
+        // This line tells the browser: "Run this the moment the page opens!"
         launch();
     </script>
 </body>
